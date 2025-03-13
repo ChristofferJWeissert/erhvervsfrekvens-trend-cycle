@@ -12,6 +12,7 @@ using Main.ErhvervsfrekvensModel
 using Main.Erhvervsfrekvens_støj
 using Main.Erhvervsfrekvens_drift
 using Main.Erhvervsfrekvens_drift_noise
+using Main.Erhvervsfrekvens_damped_trend
 
 
 
@@ -32,6 +33,8 @@ function get_model_spec(model::String)
         return Erhvervsfrekvens_drift.model_specs()
     elseif model == "Erhvervsfrekvens_drift_noise"
         return Erhvervsfrekvens_drift_noise.model_specs()
+    elseif model == "Erhvervsfrekvens_damped_trend"
+        return Erhvervsfrekvens_damped_trend.model_specs()
     else
         error("Unknown model specification: $model")
     end
@@ -54,6 +57,8 @@ function get_state_space(model::String, θ; cycle_order = 1)
         return Erhvervsfrekvens_drift.state_space(θ)
     elseif model == "Erhvervsfrekvens_drift_noise"
         return Erhvervsfrekvens_drift_noise.state_space(θ)
+    elseif model == "Erhvervsfrekvens_damped_trend"
+        return Erhvervsfrekvens_damped_trend.state_space(θ)
     else
         error("Unknown model specification: $model")
     end

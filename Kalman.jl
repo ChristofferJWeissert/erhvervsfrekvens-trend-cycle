@@ -39,6 +39,9 @@ function diffuse_kalman_filter(model, y, X, θ, α1, P1; do_smooth = true, do_si
     k = state_dim
     n = obs_dim
 
+    threshold_time = 162
+    missing_period = findall(x -> x == 9999.0, y[2, :])
+    #print("\nNumber of missing values in shortage: ", length(missing_period))
     # Preallocate arrays for filtered states and covariances.
     α_f = zeros(k, m)           # filtered state estimates
     P_f = zeros(k, k, m)        # filtered state covariances
@@ -95,27 +98,35 @@ function diffuse_kalman_filter(model, y, X, θ, α1, P1; do_smooth = true, do_si
     # --- Univariate (sequential) Kalman Filter ---
     for t in 1:m
         for i in 1:n
-            F = Z[i, :]' * P * Z[i, :] + H[i, i]
-            F_diff = Z[i, :]' * P_diff * Z[i, :]
-            
-            if F > F_tol || F_diff > F_tol
-                K = P * Z[i, :]
-                K_diff = P_diff * Z[i, :]
-                v = (y[i, t] .- d[i,:] .- Z[i, :]'* α)[1]
-                if F_diff > F_tol
-                    α = α + (K_diff / F_diff) * v
-                    P = P + (K_diff * K_diff' * F) / (F_diff^2) - (K * K_diff' + K_diff * K') / F_diff
-                    P_diff = P_diff - (K_diff * K_diff') / F_diff
-                    LogL += -0.5 * (log(2π) + log(F_diff))
-                else
-                    α = α + K * (v / F)
-                    P = P - K * (K' / F)
-                    LogL += -0.5 * (log(2π) + log(F) + (v^2)/F)
-                end
-            else
-                v = 0
+            #new
+            if i == 2 && t in missing_period
+                v = 0  # Skip update for the second variable
+                F = 1e-9
+                F_diff = 0.0  # Define F_diff to avoid UndefVarError
                 K = zeros(k)
                 K_diff = zeros(k)
+            else    
+                F = Z[i, :]' * P * Z[i, :] + H[i, i]
+                F_diff = Z[i, :]' * P_diff * Z[i, :]
+                if F > F_tol || F_diff > F_tol
+                    K = P * Z[i, :]
+                    K_diff = P_diff * Z[i, :]
+                    v = (y[i, t] .- d[i,:] .- Z[i, :]'* α)[1]
+                    if F_diff > F_tol
+                        α = α + (K_diff / F_diff) * v
+                        P = P + (K_diff * K_diff' * F) / (F_diff^2) - (K * K_diff' + K_diff * K') / F_diff
+                        P_diff = P_diff - (K_diff * K_diff') / F_diff
+                        LogL += -0.5 * (log(2π) + log(F_diff))
+                    else
+                        α = α + K * (v / F)
+                        P = P - K * (K' / F)
+                        LogL += -0.5 * (log(2π) + log(F) + (v^2)/F)
+                    end
+                else
+                    v = 0
+                    K = zeros(k)
+                    K_diff = zeros(k)
+                end
             end
             
 

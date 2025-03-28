@@ -1,6 +1,6 @@
 # Random number generation and related functions
 
-function save_results(Y,α,PRBANK,df)
+function save_results(Y,α,PRBANK,df,gab)
     # Få periodevektor og omdan til ønsket format på form yyyy(q)
     df_per = df
     df_per[!, :PERIOD] = replace.(df_per.PERIOD, r"q(\d)" => s"(\1)")
@@ -17,7 +17,7 @@ function save_results(Y,α,PRBANK,df)
 
     # Gem i excel-format
     obs_for_excel = size(Output,1) + 1
-    output_file_path = "G:\\Konjunktur\\Produktionsgab\\Gekko\\Programkode\\JULIA\\Output\\Erhvervsfrekvens_3049\\gab_output3049_erhv_$(PRBANK).xlsx"
+    output_file_path = "G:\\Konjunktur\\Produktionsgab\\Gekko\\Programkode\\JULIA\\Output\\$(gab)\\$(gab)_$(PRBANK).xlsx"
     XLSX.openxlsx(output_file_path, mode="w") do xf
         sheet = xf[1]
         sheet["A1"] = ""

@@ -13,8 +13,10 @@ using Main.Erhvervsfrekvens_støj
 using Main.Erhvervsfrekvens_drift
 using Main.Erhvervsfrekvens_drift_noise
 using Main.Erhvervsfrekvens_damped_trend
-
-
+using Main.model1629
+using Main.model1629_drift
+using Main.modelTFP
+using Main.model_ledighed
 
 #########################
 # Get Model Specification
@@ -35,6 +37,15 @@ function get_model_spec(model::String)
         return Erhvervsfrekvens_drift_noise.model_specs()
     elseif model == "Erhvervsfrekvens_damped_trend"
         return Erhvervsfrekvens_damped_trend.model_specs()
+    elseif model == "model1629"
+        return model1629.model_specs()
+    elseif model == "model1629_drift"
+        return model1629_drift.model_specs()
+    elseif model == "modelTFP"
+        return modelTFP.model_specs()
+    elseif model == "model_ledighed"
+        return model_ledighed.model_specs()
+
     else
         error("Unknown model specification: $model")
     end
@@ -59,6 +70,14 @@ function get_state_space(model::String, θ; cycle_order = 1)
         return Erhvervsfrekvens_drift_noise.state_space(θ)
     elseif model == "Erhvervsfrekvens_damped_trend"
         return Erhvervsfrekvens_damped_trend.state_space(θ)
+    elseif model == "model1629"
+        return model1629.state_space(θ)
+    elseif model == "model1629_drift"
+        return model1629_drift.state_space(θ)
+    elseif model == "modelTFP"
+        return modelTFP.state_space(θ)
+    elseif model == "model_ledighed"
+        return model_ledighed.state_space(θ)
     else
         error("Unknown model specification: $model")
     end
